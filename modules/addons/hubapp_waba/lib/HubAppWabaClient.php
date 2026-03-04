@@ -6,7 +6,7 @@ if (!defined("WHMCS")) die("Access Denied");
 
 /**
  * HubApp WABA Client - Conexão API Oficial Meta
- * Versão 1.0.9: Com tratamento para erro 132018 (parâmetros de linha única)
+ * Versão 1.1.0: Preparado para Auto-Login URL e tratamento de Erro 132018
  */
 class HubAppWabaClient {
 
@@ -43,7 +43,6 @@ class HubAppWabaClient {
         // Sanitização de Parâmetros (Correção do Erro 132018)
         $bodyParameters = [];
         foreach ($params as $value) {
-            // A Meta proíbe quebras de linha (\n, \r), abas (\t) ou mais de 4 espaços em variáveis
             $cleanValue = preg_replace('/[\r\n\t]+/', ' ', (string)$value);
             $cleanValue = preg_replace('/ {4,}/', ' ', $cleanValue);
             

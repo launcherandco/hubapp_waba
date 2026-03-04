@@ -7,36 +7,41 @@ Módulo de integração profissional para envio de notificações via **WhatsApp
 ## 🚀 Funcionalidades
 
 * **Conexão Direta (Graph API)**: Dispensa gateways intermediários (v21.0+).
-* **Sanitização v1.0.8**: Tratamento automático de variáveis para evitar o erro Meta #132018.
+* **Autenticação Sem Senha (SSO)**: Geração nativa de tokens (Auto-Login) para que os clientes acessem faturas e tickets com apenas um clique pelo WhatsApp.
 * **Branding Nativo**: Suporte para Cabeçalho e Rodapé institucionais (LD | HubApp).
-* **Segurança**: Substituição de envio de senhas por links diretos de acesso.
+* **Sanitização Inteligente**: Tratamento automático de variáveis para garantir conformidade de quebra de linhas exigida pela Meta.
 
 ---
 
 ## 📂 Estrutura do Módulo
 
-* `hubapp_waba.php`: Interface administrativa v1.0.9.
-* `hooks.php`: Lógica de gatilhos e despacho de variáveis.
-* `lib/HubAppWabaClient.php`: Motor de envio e limpeza de strings.
+* `hubapp_waba.php`: Interface administrativa v1.1.0 (Com suporte a templates duplos).
+* `hooks.php`: Lógica de gatilhos, geração de links SSO e despacho de variáveis.
+* `lib/HubAppWabaClient.php`: Motor de envio e formatação de payload JSON.
 * `index.php`: Proteção de diretórios.
 
 ---
 
 ## 📋 Mapeamento Técnico de Variáveis
 
-Ao configurar seus templates na Meta, as variáveis `{{n}}` receberão os seguintes dados vindos do WHMCS:
+O módulo v1.1.0 suporta **dois slots de templates por evento**: o padrão e o com Auto-Login. Se o template de Auto-Login for preenchido, o sistema priorizará ele e substituirá a última variável de link por uma URL segura de autenticação instantânea (`CreateSsoToken`).
 
-| Evento | Variável 1 | Variável 2 | Variável 3 | Variável 4 | Variável 5 |
+As variáveis `{{n}}` cadastradas na Meta receberão os seguintes dados vindos do WHMCS:
+
+| Evento | Var 1 | Var 2 | Var 3 | Var 4 | Var 5 (Link / Auto-Login) |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Fatura Gerada** | Nome | ID Fatura | Valor | Vencimento | Link Fatura |
-| **Fatura Paga** | Nome | ID Fatura | - | - | - |
-| **Lembretes Atraso** | Nome | ID Fatura | Vencimento | Link Fatura | - |
-| **Ticket Resposta** | Nome | Assunto | Link Ticket | - | - |
-| **Serviço Ativado** | Nome | Domínio | Link Serviço | - | - |
-| **Serviço Suspenso** | Nome | Domínio | Link Serviço | - | - |
-| **Expiração Domínio** | Nome | Domínio | Dias | Data Exp. | Link Renova |
+| **Fatura Gerada** | Nome | ID Fatura | Valor | Vencimento | Link da Fatura |
+| **Fatura Paga** | Nome | ID Fatura | Link Fatura* | - | - |
+| **Lembretes Atraso** | Nome | ID Fatura | Vencimento | Link da Fatura | - |
+| **Ticket Resposta** | Nome | Assunto | Link do Ticket | - | - |
+| **Serviço Ativado** | Nome | Domínio | Link do Serviço | - | - |
+| **Serviço Suspenso** | Nome | Domínio | Link do Serviço | - | - |
+| **Expiração Domínio** | Nome | Domínio | Dias Restantes | Data Expiração | Link de Renovação |
+| **Admin: Novo Ticket**| Assunto | Nome | Prioridade | - | - |
 | **Login Admin** | User | - | - | - | - |
-| **Aviso Manual** | Conteúdo | - | - | - | - |
+| **Envio Manual** | Texto Livre | - | - | - | - |
+
+> *Nota: Quando usar as versões `_autologin` no painel, o campo "Link" correspondente na tabela acima enviará automaticamente o cliente autenticado para a respectiva página.*
 
 ---
 
