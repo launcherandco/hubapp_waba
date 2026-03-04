@@ -45,7 +45,6 @@ function hubapp_waba_output($vars) {
         'InvoiceCreated' => 'Fatura Gerada (Padrão)',
         'InvoiceCreated_autologin' => 'Fatura Gerada (Com Auto-Login)',
         'InvoicePaid' => 'Pagamento Confirmado (Padrão)',
-        'InvoicePaid_autologin' => 'Pagamento Confirmado (Com Auto-Login)',
         'InvoicePaymentReminderFirst' => '1º Aviso de Atraso (Padrão)',
         'InvoicePaymentReminderFirst_autologin' => '1º Aviso de Atraso (Com Auto-Login)',
         'InvoicePaymentReminderSecond' => '2º Aviso de Atraso (Padrão)',
@@ -158,4 +157,5 @@ function hubapp_waba_output($vars) {
     echo '<div class="text-center" style="margin-top:20px; color:#888;">
         <small>HubApp WABA v1.1.0 | Oficial Meta | Suporte: <a href="https://licencas.digital" target="_blank">licencas.digital</a></small>
     </div>';
+
 }
