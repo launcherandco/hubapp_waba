@@ -123,13 +123,33 @@ function hubapp_waba_output($vars) {
             <table class="table table-striped">
                 <thead><tr><th>Evento WHMCS</th><th>Nome do Template Aprovado na Meta</th></tr></thead>
                 <tbody>';
+    // Mapa de sugestões amigáveis para os placeholders
+    $hints = [
+        'InvoiceCreated' => 'fatura_gerada',
+        'InvoicePaid' => 'fatura_paga',
+        'InvoicePaymentReminderFirst' => 'fatura_atrasada',
+        'InvoicePaymentReminderSecond' => 'fatura_atrasada_2',
+        'InvoicePaymentReminderThird' => 'fatura_atrasada_3',
+        'TicketAdminReply' => 'ticket_resposta',
+        'TicketOpenAdmin' => 'admin_novo_ticket',
+        'AdminLogin' => 'admin_login',
+        'AfterModuleCreate' => 'servico_ativo',
+        'AfterModuleSuspend' => 'servico_suspenso',
+        'DomainRenewalNotice' => 'dominio_expirando',
+    ];
+
     foreach ($events as $key => $name) {
         $val = Capsule::table('tbladdonmodules')->where('module' , 'hubapp_waba')->where('setting', 'tplname_' . $key)->value('value');
         
-        // Destacar visualmente os campos de auto-login para facilitar a configuração
-        $rowStyle = strpos($key, '_autologin') !== false ? 'background-color: #f0f8ff;' : '';
+        $isAutoLogin = strpos($key, '_autologin') !== false;
+        $rowStyle = $isAutoLogin ? 'background-color: #f0f8ff;' : '';
         
-        echo '<tr style="'.$rowStyle.'"><td><strong>'.$name.'</strong></td><td><input type="text" name="tplname_'.$key.'" class="form-control" value="'.htmlspecialchars($val).'" placeholder="ex: fatura_gerada_v2"></td></tr>';
+        // Gera o placeholder dinâmico baseado no mapa acima
+        $baseKey = str_replace('_autologin', '', $key);
+        $hintText = isset($hints[$baseKey]) ? $hints[$baseKey] : 'nome_do_template';
+        $placeholder = $isAutoLogin ? "ex: {$hintText}_autologin" : "ex: {$hintText}";
+        
+        echo '<tr style="'.$rowStyle.'"><td><strong>'.$name.'</strong></td><td><input type="text" name="tplname_'.$key.'" class="form-control" value="'.htmlspecialchars((string)$val).'" placeholder="'.$placeholder.'"></td></tr>';
     }
     echo '</tbody></table></div>
         <div class="panel-footer"><button type="submit" name="save_waba" class="btn btn-success"><i class="fas fa-save"></i> Salvar Mapeamento</button></div>
