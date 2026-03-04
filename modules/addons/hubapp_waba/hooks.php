@@ -75,16 +75,13 @@ add_hook('InvoiceCreationPreEmail', 1, function($vars) {
 });
 
 // 2. Pagamento Confirmado
+// Variáveis: {{1}} Nome, {{2}} ID da Fatura
 add_hook('InvoicePaid', 1, function($vars) {
     $inv = Capsule::table('tblinvoices')->where('id', $vars['invoiceid'])->first();
     $cli = Capsule::table('tblclients')->where('id', $inv->userid)->first();
-    $path = "viewinvoice.php?id=" . $vars['invoiceid'];
-
-    waba_dispatch('InvoicePaid', $cli->id, 
-        [$cli->firstname, $vars['invoiceid']],
-        $path,
-        [$cli->firstname, $vars['invoiceid'], '{autologin_url}']
-    );
+    
+    // Disparo simples, sem parâmetros de auto-login
+    waba_dispatch('InvoicePaid', $cli->id, [$cli->firstname, $vars['invoiceid']]);
 });
 
 // 3, 4 e 5. Lembretes de Fatura
