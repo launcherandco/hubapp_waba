@@ -32,6 +32,18 @@ function hubapp_waba_config() {
             "use_footer" => ["FriendlyName" => "Ativar Footer", "Type" => "yesno"],
             "footer_text" => ["FriendlyName" => "Texto Footer", "Type" => "text", "Default" => "LD | HubApp - Launcher & Co."],
             "manual_template" => ["FriendlyName" => "Template Manual/Teste", "Type" => "text", "Description" => "Nome do template aprovado na Meta."],
+            
+            // NOVO CAMPO: Seletor de Tecnologia de Login
+            "autologin_type" => [
+                "FriendlyName" => "Tipo de Auto-Login",
+                "Type" => "dropdown",
+                "Options" => [
+                    "jwt" => "HubApp JWT Rápido (Recomendado)",
+                    "sso" => "WHMCS SSO Nativo (Padrão Antigo)"
+                ],
+                "Default" => "jwt",
+                "Description" => "Escolha qual tecnologia gerar a URL de auto-login no WhatsApp."
+            ],
         ]
     ];
 }
