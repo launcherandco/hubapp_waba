@@ -12,22 +12,71 @@ use HubAppWabaModule\HubAppWabaClient;
 require_once __DIR__ . '/lib/HubAppWabaClient.php';
 
 /**
- * Função para gerar URL de Auto-Login via Single Sign-On do WHMCS
+ * Função para gerar URL de Auto-Login com Seletor (JWT vs SSO)
  */
 function waba_get_autologin_url($clientId, $destinationPath) {
-    $results = localAPI('CreateSsoToken', [
-        'client_id' => $clientId,
-        'destination' => 'sso:custom_redirect',
-        'sso_redirect_path' => $destinationPath
-    ]);
-    
-    if (isset($results['result']) && $results['result'] == 'success') {
-        return $results['redirect_url'];
+    try {
+        // Descobre qual o tipo escolhido nas configurações do WABA
+        $wabaConfig = Capsule::table('tbladdonmodules')
+            ->where('module', 'hubapp_waba')
+            ->pluck('value', 'setting');
+        
+        $autologinType = $wabaConfig['autologin_type'] ?? 'jwt';
+        $systemUrl = rtrim(Capsule::table('tblconfiguration')->where('setting', 'SystemURL')->value('value'), '/');
+
+        // ============================================
+        // OPÇÃO 1: WHMCS SSO Nativo (oauth/singlesignon.php)
+        // ============================================
+        if ($autologinType === 'sso') {
+            $results = localAPI('CreateSsoToken', [
+                'client_id' => $clientId,
+                'destination' => 'sso:custom_redirect',
+                'sso_redirect_path' => $destinationPath
+            ]);
+            
+            if (isset($results['result']) && $results['result'] == 'success') {
+                return $results['redirect_url'];
+            }
+            return $systemUrl . '/' . ltrim($destinationPath, '/');
+        }
+
+        // ============================================
+        // OPÇÃO 2: HubApp JWT Rápido (autologin.php?token=...)
+        // ============================================
+        if ($autologinType === 'jwt') {
+            // Busca configurações do Módulo AutoLogin HubApp
+            $config = Capsule::table('tbladdonmodules')
+                ->where('module', 'hubapp_autologin')
+                ->pluck('value', 'setting');
+
+            $secretKey = $config['autologin_key'] ?? '';
+
+            // Se não tiver chave, envia o link normal
+            if (!$secretKey || $clientId <= 0) {
+                return $systemUrl . '/' . ltrim($destinationPath, '/');
+            }
+
+            $expHours = (int)($config['expiration_hours'] ?? 72);
+
+            // Cria o Token JWT limpo
+            $header = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode(json_encode(['typ' => 'JWT', 'alg' => 'HS256'])));
+            $payload = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode(json_encode([
+                'uid' => (int)$clientId,
+                'exp' => time() + ($expHours * 3600),
+                'iss' => 'HubApp'
+            ])));
+
+            $signature = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode(hash_hmac('sha256', "$header.$payload", $secretKey, true)));
+
+            return "$systemUrl/autologin.php?token=$header.$payload.$signature";
+        }
+
+        return $systemUrl . '/' . ltrim($destinationPath, '/');
+
+    } catch (\Exception $e) {
+        $systemUrl = Capsule::table('tblconfiguration')->where('setting', 'SystemURL')->value('value');
+        return rtrim($systemUrl, '/') . '/' . ltrim($destinationPath, '/');
     }
-    
-    // Fallback de segurança para URL normal caso o SSO falhe
-    $systemUrl = Capsule::table('tblconfiguration')->where('setting', 'SystemURL')->value('value');
-    return rtrim($systemUrl, '/') . '/' . ltrim($destinationPath, '/');
 }
 
 /**
