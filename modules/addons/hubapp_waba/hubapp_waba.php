@@ -22,7 +22,7 @@ function hubapp_waba_config() {
         "author" => "HubApp",
         "version" => "1.1.0",
         "fields" => [
-            "api_endpoint" => ["FriendlyName" => "Endpoint WABA", "Type" => "text", "Size" => "80", "Description" => "Ex: https://graph.facebook.com/v21.0/ID_DO_NUMERO/"],
+            "api_endpoint" => ["FriendlyName" => "Endpoint WABA", "Type" => "text", "Size" => "80", "Description" => "Ex: https://graph.facebook.com/v24.0/ID_DO_NUMERO/"],
             "api_token" => ["FriendlyName" => "API Token Meta", "Type" => "password", "Size" => "80"],
             "whatsapp_field_id" => ["FriendlyName" => "Campo WhatsApp", "Type" => "dropdown", "Options" => $customFields],
             "admin_whatsapp" => ["FriendlyName" => "WhatsApp Admin", "Type" => "text", "Size" => "25", "Description" => "Número com DDI (Ex: 5534999999999)"],
