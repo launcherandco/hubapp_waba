@@ -28,16 +28,16 @@ class HubAppWabaClient {
     public static function sendTemplate($clientId, $templateName, $params = []) {
         $number = self::getValidNumber($clientId);
         if (empty($number) || empty($templateName)) return false;
-        return self::execute($number, $templateName, $params);
+        return self::execute($number, $templateName, $params, $clientId);
     }
 
     public static function sendTemplateByNumber($number, $templateName, $params = []) {
         $cleanNumber = preg_replace('/\D/', '', $number);
         if (empty($cleanNumber) || empty($templateName)) return false;
-        return self::execute($cleanNumber, $templateName, $params);
+        return self::execute($cleanNumber, $templateName, $params, null);
     }
 
-    private static function execute($to, $templateName, $params) {
+    private static function execute($to, $templateName, $params, $clientId = null) {
         $config = Capsule::table('tbladdonmodules')->where('module', 'hubapp_waba')->pluck('value', 'setting');
         
         // Sanitização de Parâmetros (Correção do Erro 132018)
@@ -99,7 +99,23 @@ class HubAppWabaClient {
         curl_setopt($ch, CURLOPT_TIMEOUT, 30);
         
         $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
+
+        $decoded = json_decode($response, true);
+        $status = (isset($decoded['messages'][0]['id']) || $httpCode === 200) ? 'sent' : 'error';
+
+        try {
+            Capsule::table('hubapp_waba_logs')->insert([
+                'created_at'    => date('Y-m-d H:i:s'),
+                'client_id'     => $clientId,
+                'recipient'     => $to,
+                'template_name' => $templateName,
+                'params'        => json_encode($params, JSON_UNESCAPED_UNICODE),
+                'status'        => $status,
+                'response'      => $response,
+            ]);
+        } catch (\Exception $e) {}
 
         return $response;
     }
