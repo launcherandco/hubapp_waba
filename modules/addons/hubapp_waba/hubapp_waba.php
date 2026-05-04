@@ -9,6 +9,26 @@ if (!defined("WHMCS")) die("Access Denied");
 
 use WHMCS\Database\Capsule;
 
+function hubapp_waba_activate() {
+    try {
+        Capsule::schema()->create('hubapp_waba_logs', function ($table) {
+            $table->increments('id');
+            $table->dateTime('created_at');
+            $table->unsignedInteger('client_id')->nullable();
+            $table->string('recipient', 30);
+            $table->string('template_name', 100);
+            $table->text('params')->nullable();
+            $table->string('status', 10);
+            $table->text('response')->nullable();
+        });
+    } catch (\Exception $e) {}
+    return ['status' => 'success', 'description' => 'HubApp WABA ativado com sucesso.'];
+}
+
+function hubapp_waba_deactivate() {
+    return ['status' => 'success', 'description' => 'HubApp WABA desativado.'];
+}
+
 function hubapp_waba_config() {
     $customFields = [0 => "Usar apenas telefone padrão"];
     try {
@@ -165,6 +185,87 @@ function hubapp_waba_output($vars) {
     echo '</tbody></table></div>
         <div class="panel-footer"><button type="submit" name="save_waba" class="btn btn-success"><i class="fas fa-save"></i> Salvar Mapeamento</button></div>
     </div></form>';
+
+    // --- Painel de Log de Mensagens ---
+    // Garante que a tabela existe mesmo se o módulo foi ativado antes desta versão
+    try {
+        if (!Capsule::schema()->hasTable('hubapp_waba_logs')) {
+            hubapp_waba_activate();
+        }
+    } catch (\Exception $e) {}
+
+    if (Capsule::schema()->hasTable('hubapp_waba_logs')) {
+        if (isset($_POST['clean_logs'])) {
+            $days = (int)$_POST['clean_days'];
+            if ($days === 0) {
+                Capsule::table('hubapp_waba_logs')->truncate();
+                echo '<div class="alert alert-warning">🗑️ Todos os logs foram apagados.</div>';
+            } elseif ($days > 0) {
+                $cutoff = date('Y-m-d H:i:s', strtotime("-{$days} days"));
+                Capsule::table('hubapp_waba_logs')->where('created_at', '<', $cutoff)->delete();
+                echo '<div class="alert alert-success">✅ Logs com mais de ' . $days . ' dias removidos.</div>';
+            }
+        }
+
+        $logs = Capsule::table('hubapp_waba_logs')->orderBy('id', 'desc')->limit(200)->get();
+        $totalLogs = Capsule::table('hubapp_waba_logs')->count();
+
+        echo '<div class="panel panel-default" style="margin-top:20px;">
+            <div class="panel-heading" style="display:flex;justify-content:space-between;align-items:center;">
+                <h3 class="panel-title"><i class="fas fa-history"></i> Log de Mensagens Enviadas <span class="badge">' . $totalLogs . '</span></h3>
+                <form method="post" style="margin:0;display:flex;gap:6px;align-items:center;">
+                    <select name="clean_days" class="form-control input-sm" style="width:auto;">
+                        <option value="7">Mais de 7 dias</option>
+                        <option value="30">Mais de 30 dias</option>
+                        <option value="90">Mais de 90 dias</option>
+                        <option value="0">Todos os registros</option>
+                    </select>
+                    <button type="submit" name="clean_logs" class="btn btn-danger btn-sm"
+                        onclick="return confirm(\'Confirma a limpeza dos logs?\');">
+                        <i class="fas fa-trash"></i> Limpar
+                    </button>
+                </form>
+            </div>
+            <div class="panel-body" style="padding:0;">
+                <div class="table-responsive" style="max-height:450px;overflow-y:auto;">
+                <table class="table table-condensed table-striped" style="margin:0;font-size:12px;">
+                    <thead><tr>
+                        <th>#</th><th>Data/Hora</th><th>Destinatário</th><th>Template</th><th>Parâmetros</th><th>Status</th>
+                    </tr></thead>
+                    <tbody>';
+
+        foreach ($logs as $log) {
+            $params = json_decode($log->params, true);
+            $paramsStr = is_array($params) ? implode(' | ', array_map('htmlspecialchars', $params)) : htmlspecialchars((string)$log->params);
+            $badge = ($log->status === 'sent')
+                ? '<span class="label label-success">Enviado</span>'
+                : '<span class="label label-danger">Erro</span>';
+
+            $clientLink = $log->client_id
+                ? '<a href="clientssummary.php?userid=' . $log->client_id . '" target="_blank">#' . $log->client_id . '</a> '
+                : '';
+
+            echo '<tr>
+                <td>' . $log->id . '</td>
+                <td style="white-space:nowrap;">' . $log->created_at . '</td>
+                <td>' . $clientLink . htmlspecialchars($log->recipient) . '</td>
+                <td><code>' . htmlspecialchars($log->template_name) . '</code></td>
+                <td style="max-width:260px;word-break:break-word;">' . $paramsStr . '</td>
+                <td>' . $badge . '</td>
+            </tr>';
+        }
+
+        echo '  </tbody>
+                </table>
+                </div>
+            </div>';
+
+        if ($totalLogs > 200) {
+            echo '<div class="panel-footer text-muted" style="font-size:11px;">Exibindo os 200 mais recentes de ' . $totalLogs . ' registros.</div>';
+        }
+
+        echo '</div>';
+    }
 
     echo '<div class="text-center" style="margin-top:20px; color:#888;">
         <small>HubApp WABA v1.1.0 | Oficial Meta | Suporte: <a href="https://licencas.digital" target="_blank">licencas.digital</a></small>
