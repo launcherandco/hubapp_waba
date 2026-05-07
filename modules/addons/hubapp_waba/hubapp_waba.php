@@ -198,7 +198,7 @@ function hubapp_waba_output($vars) {
         if (isset($_POST['clean_logs'])) {
             $days = (int)$_POST['clean_days'];
             if ($days === 0) {
-                Capsule::table('hubapp_waba_logs')->truncate();
+                Capsule::table('hubapp_waba_logs')->delete();
                 echo '<div class="alert alert-warning">🗑️ Todos os logs foram apagados.</div>';
             } elseif ($days > 0) {
                 $cutoff = date('Y-m-d H:i:s', strtotime("-{$days} days"));
