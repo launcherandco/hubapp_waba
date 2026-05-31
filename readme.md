@@ -15,7 +15,7 @@ Módulo de integração profissional para envio de notificações via **WhatsApp
 
 ## 📂 Estrutura do Módulo
 
-* `hubapp_waba.php`: Interface administrativa v1.1.0 (Com suporte a templates duplos).
+* `hubapp_waba.php`: Interface administrativa v1.2.0 (Com suporte a templates duplos e múltiplos avisos).
 * `hooks.php`: Lógica de gatilhos, geração de links SSO e despacho de variáveis.
 * `lib/HubAppWabaClient.php`: Motor de envio e formatação de payload JSON.
 * `index.php`: Proteção de diretórios.
@@ -24,21 +24,22 @@ Módulo de integração profissional para envio de notificações via **WhatsApp
 
 ## 📋 Mapeamento Técnico de Variáveis
 
-O módulo v1.1.0 suporta **dois slots de templates por evento**: o padrão e o com Auto-Login. Se o template de Auto-Login for preenchido, o sistema priorizará ele e substituirá a última variável de link por uma URL segura de autenticação instantânea (`CreateSsoToken`).
+O módulo v1.2.0 suporta **dois slots de templates por evento**: o padrão e o com Auto-Login. Se o template de Auto-Login for preenchido, o sistema priorizará ele e substituirá a última variável de link por uma URL segura de autenticação instantânea (`CreateSsoToken`).
 
 As variáveis `{{n}}` cadastradas na Meta receberão os seguintes dados vindos do WHMCS:
 
 | Evento | Var 1 | Var 2 | Var 3 | Var 4 | Var 5 (Link / Auto-Login) |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Fatura Gerada** | Nome | ID Fatura | Valor | Vencimento | Link da Fatura |
-| **Fatura Paga** | Nome | ID Fatura | Link Fatura* | - | - |
-| **Lembretes Atraso** | Nome | ID Fatura | Vencimento | Link da Fatura | - |
+| **Fatura a Vencer** | Nome | ID Fatura | Vencimento | Link da Fatura | - |
+| **Fatura Paga** | Nome | ID Fatura | - | - | - |
+| **Lembretes Atraso (1º, 2º e 3º)** | Nome | ID Fatura | Vencimento | Link da Fatura | - |
 | **Ticket Resposta** | Nome | Assunto | Link do Ticket | - | - |
 | **Serviço Ativado** | Nome | Domínio | Link do Serviço | - | - |
 | **Serviço Suspenso** | Nome | Domínio | Link do Serviço | - | - |
 | **Expiração Domínio** | Nome | Domínio | Dias Restantes | Data Expiração | Link de Renovação |
 | **Admin: Novo Ticket**| Assunto | Nome | Prioridade | - | - |
-| **Login Admin** | User | - | - | - | - |
+| **Login Admin** | Usuário | - | - | - | - |
 | **Envio Manual** | Texto Livre | - | - | - | - |
 
 > *Nota: Quando usar as versões `_autologin` no painel, o campo "Link" correspondente na tabela acima enviará automaticamente o cliente autenticado para a respectiva página.*
@@ -47,7 +48,7 @@ As variáveis `{{n}}` cadastradas na Meta receberão os seguintes dados vindos d
 
 ## 🛠️ Configuração Rápida
 
-1. **Endpoint**: `https://graph.facebook.com/v21.0/ID_DO_NUMERO/`
+1. **Endpoint**: `https://graph.facebook.com/v24.0/ID_DO_NUMERO/`
 2. **Token**: Insira o Token de Acesso Permanente da Meta.
 3. **Mapeamento**: No painel do addon, insira os nomes dos templates conforme aprovados na Meta (ex: `fatura_gerada`).
 
@@ -65,6 +66,6 @@ As variáveis `{{n}}` cadastradas na Meta receberão os seguintes dados vindos d
 
 ## 🆘 Suporte e Documentação de Modelos
 
-* **Modelos de Texto**: Veja o arquivo `TEMPLATES.md` para sugestões de textos anti-rejeição.
+* **Modelos de Texto**: Veja o arquivo `TEMPLATES.md` para sugestões de textos anti-rejeição e suporte a múltiplos lembretes.
 * **Desenvolvido por**: HubApp / Launcher & Co.
 * **Suporte**: [licencas.digital](https://licencas.digital)

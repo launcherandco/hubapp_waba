@@ -1,8 +1,8 @@
 <?php
 /**
  * HubApp WABA WHMCS (API Oficial Meta)
- * @author     HubApp / Licencas.Digital
- * @version    1.1.0 (Auto-Login Support)
+ * @author     Launcher
+ * @version    1.2.0 (Auto-Login Support)
  */
 
 if (!defined("WHMCS")) die("Access Denied");
@@ -40,7 +40,7 @@ function hubapp_waba_config() {
         "name" => "HubApp WABA WHMCS",
         "description" => "Integração oficial via WhatsApp Business API (Meta). Requer templates aprovados.",
         "author" => "HubApp",
-        "version" => "1.1.0",
+        "version" => "1.2.0",
         "fields" => [
             "api_endpoint" => ["FriendlyName" => "Endpoint WABA", "Type" => "text", "Size" => "80", "Description" => "Ex: https://graph.facebook.com/v24.0/ID_DO_NUMERO/"],
             "api_token" => ["FriendlyName" => "API Token Meta", "Type" => "password", "Size" => "80"],
@@ -77,6 +77,8 @@ function hubapp_waba_output($vars) {
         'InvoiceCreated' => 'Fatura Gerada (Padrão)',
         'InvoiceCreated_autologin' => 'Fatura Gerada (Com Auto-Login)',
         'InvoicePaid' => 'Pagamento Confirmado (Padrão)',
+        'InvoiceUnpaid' => 'Fatura a Vencer (Padrão)',
+        'InvoiceUnpaid_autologin' => 'Fatura a Vencer (Com Auto-Login)',
         'InvoicePaymentReminderFirst' => '1º Aviso de Atraso (Padrão)',
         'InvoicePaymentReminderFirst_autologin' => '1º Aviso de Atraso (Com Auto-Login)',
         'InvoicePaymentReminderSecond' => '2º Aviso de Atraso (Padrão)',
@@ -158,6 +160,7 @@ function hubapp_waba_output($vars) {
     $hints = [
         'InvoiceCreated' => 'fatura_gerada',
         'InvoicePaid' => 'fatura_paga',
+        'InvoiceUnpaid' => 'fatura_a_vencer',
         'InvoicePaymentReminderFirst' => 'fatura_atrasada',
         'InvoicePaymentReminderSecond' => 'fatura_atrasada_2',
         'InvoicePaymentReminderThird' => 'fatura_atrasada_3',
@@ -268,7 +271,7 @@ function hubapp_waba_output($vars) {
     }
 
     echo '<div class="text-center" style="margin-top:20px; color:#888;">
-        <small>HubApp WABA v1.1.0 | Oficial Meta | Suporte: <a href="https://licencas.digital" target="_blank">licencas.digital</a></small>
+        <small>HubApp WABA v1.2.0 | Oficial Meta | Suporte: <a href="https://licencas.digital" target="_blank">licencas.digital</a></small>
     </div>';
 
 }

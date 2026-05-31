@@ -1,7 +1,7 @@
 <?php
 /**
  * HubApp WABA WHMCS - Hooks Oficiais
- * Versão: 1.1.0 (Auto-Login Ready)
+ * Versão: 1.2.0 (Auto-Login Ready)
  */
 
 if (!defined("WHMCS")) die("Access Denied");
@@ -133,7 +133,25 @@ add_hook('InvoicePaid', 1, function($vars) {
     waba_dispatch('InvoicePaid', $cli->id, [$cli->firstname, $vars['invoiceid']]);
 });
 
-// 3, 4 e 5. Lembretes de Fatura
+// 3. Lembrete de Fatura a Vencer (Antes do Vencimento)
+add_hook('InvoiceUnpaid', 1, function($vars) {
+    $inv = Capsule::table('tblinvoices')->where('id', $vars['invoiceid'])->first();
+    if (!$inv) return;
+    $cli = Capsule::table('tblclients')->where('id', $inv->userid)->first();
+    
+    $systemUrl = Capsule::table('tblconfiguration')->where('setting', 'SystemURL')->value('value');
+    $normalUrl = $systemUrl . "viewinvoice.php?id=" . $vars['invoiceid'];
+    $path = "viewinvoice.php?id=" . $vars['invoiceid'];
+
+    // Variáveis: {{1}} Nome, {{2}} ID da Fatura, {{3}} Vencimento, {{4}} URL
+    waba_dispatch('InvoiceUnpaid', $cli->id, 
+        [$cli->firstname, $vars['invoiceid'], fromMySQLDate($inv->duedate), $normalUrl],
+        $path,
+        [$cli->firstname, $vars['invoiceid'], fromMySQLDate($inv->duedate), '{autologin_url}']
+    );
+});
+
+// 4 e 5 e 6. Lembretes de Fatura
 add_hook('InvoicePaymentReminder', 1, function($vars) {
     $inv = Capsule::table('tblinvoices')->where('id', $vars['invoiceid'])->first();
     $cli = Capsule::table('tblclients')->where('id', $inv->userid)->first();
@@ -151,7 +169,7 @@ add_hook('InvoicePaymentReminder', 1, function($vars) {
     );
 });
 
-// 6. Resposta em Ticket
+// 7. Resposta em Ticket
 add_hook('TicketAdminReply', 1, function($vars) {
     $ticket = Capsule::table('tbltickets')->where('id', $vars['ticketid'])->first();
     $cli = Capsule::table('tblclients')->where('id', $ticket->userid)->first();
@@ -167,7 +185,7 @@ add_hook('TicketAdminReply', 1, function($vars) {
     );
 });
 
-// 7. Admin: Novo Ticket
+// 8. Admin: Novo Ticket
 add_hook('TicketOpen', 1, function($vars) {
     $config = Capsule::table('tbladdonmodules')->where('module', 'hubapp_waba')->pluck('value', 'setting');
     if ($config['tplname_TicketOpenAdmin'] && $config['admin_whatsapp']) {
@@ -180,7 +198,7 @@ add_hook('TicketOpen', 1, function($vars) {
     }
 });
 
-// 8. Alerta de Login Admin
+// 9. Alerta de Login Admin
 add_hook('AdminLogin', 1, function($vars) {
     $config = Capsule::table('tbladdonmodules')->where('module', 'hubapp_waba')->pluck('value', 'setting');
     if ($config['tplname_AdminLogin'] && $config['admin_whatsapp']) {
@@ -188,7 +206,7 @@ add_hook('AdminLogin', 1, function($vars) {
     }
 });
 
-// 9. Serviço Ativado
+// 10. Serviço Ativado
 add_hook('AfterModuleCreate', 1, function($vars) {
     $p = $vars['params'];
     $firstName = Capsule::table('tblclients')->where('id', $p['userid'])->value('firstname');
@@ -204,7 +222,7 @@ add_hook('AfterModuleCreate', 1, function($vars) {
     );
 });
 
-// 10. Serviço Suspenso
+// 11. Serviço Suspenso
 add_hook('AfterModuleSuspend', 1, function($vars) {
     $p = $vars['params'];
     $firstName = Capsule::table('tblclients')->where('id', $p['userid'])->value('firstname');
@@ -220,7 +238,7 @@ add_hook('AfterModuleSuspend', 1, function($vars) {
     );
 });
 
-// 11. Expiração de Domínio
+// 12. Expiração de Domínio
 add_hook('DomainRenewalNotice', 1, function($vars) {
     $dom = Capsule::table('tbldomains')->where('id', $vars['domainid'])->first();
     $cli = Capsule::table('tblclients')->where('id', $dom->userid)->first();

@@ -12,16 +12,22 @@ Este guia contém os textos validados para cadastro na Meta. Todos os modelos te
 
 ## 📋 Modelos Padrão vs. Auto-Login
 
-Para tirar o máximo proveito do módulo v1.1.0, recomendamos aprovar duas versões de cada template: uma padrão e uma para o **acesso sem senha (SSO)**.
+Para tirar o máximo proveito do módulo v1.2.0, recomendamos aprovar duas versões de cada template: uma padrão e uma para o **acesso sem senha (SSO)**.
 
 ### 💰 Faturamento
 | Nome na Meta | Texto Sugerido (Corpo do Template) | Amostras (Samples) |
 | :--- | :--- | :--- |
 | `fatura_gerada` | Olá {{1}}, sua fatura #{{2}} no valor de R$ {{3}} foi gerada com vencimento em {{4}}. Você pode acessar seu boleto no link {{5}} para realizar o pagamento agora. | {{1}}: João, {{2}}: 1050, {{3}}: 59.90, {{4}}: 15/02/2026, {{5}}: https://sua.loja/f |
 | `fatura_gerada_autologin` | Olá {{1}}, sua fatura #{{2}} no valor de R$ {{3}} vence em {{4}}. Acesse e pague sem precisar de senha através do link seguro {{5}} agora mesmo. | *(Mesmas amostras)* |
+| `fatura_a_vencer` | Olá {{1}}, lembramos que sua fatura #{{2}} vencerá no dia {{3}}. Você pode acessar o documento no link {{4}} para realizar o pagamento no prazo. | {{1}}: João, {{2}}: 1050, {{3}}: 15/02/2026, {{4}}: https://sua.loja/f |
+| `fatura_a_vencer_autologin` | Olá {{1}}, lembramos que sua fatura #{{2}} vencerá no dia {{3}}. Acesse e pague sem precisar de senha através do link seguro {{4}} agora mesmo. | *(Mesmas amostras)* |
 | `fatura_paga` | Obrigado {{1}}! Confirmamos o recebimento do pagamento referente à fatura #{{2}} com sucesso em nosso sistema. | {{1}}: João, {{2}}: 1050 |
 | `fatura_atrasada` | ⚠️ Olá {{1}}, lembramos que a fatura #{{2}} venceu em {{3}}. Pedimos que regularize através do link {{4}} para evitar suspensões em sua conta. | {{1}}: João, {{2}}: 1050, {{3}}: 10/02/2026, {{4}}: https://sua.loja/f |
 | `fatura_atrasada_autologin` | ⚠️ Olá {{1}}, a fatura #{{2}} venceu em {{3}}. Regularize em 1-clique sem precisar digitar senha através do link {{4}} imediatamente. | *(Mesmas amostras)* |
+| `fatura_atrasada_2` | ⚠️ Olá {{1}}, este é o nosso 2º aviso. A fatura #{{2}} venceu em {{3}}. Pedimos que regularize através do link {{4}} para evitar suspensões em sua conta. | {{1}}: João, {{2}}: 1050, {{3}}: 10/02/2026, {{4}}: https://sua.loja/f |
+| `fatura_atrasada_2_autologin` | ⚠️ Olá {{1}}, este é o nosso 2º aviso. A fatura #{{2}} venceu em {{3}}. Regularize em 1-clique sem precisar digitar senha através do link {{4}} imediatamente. | *(Mesmas amostras)* |
+| `fatura_atrasada_3` | 🚨 Olá {{1}}, aviso crítico! A fatura #{{2}} venceu em {{3}} e seus serviços correm risco. Regularize através do link {{4}} com extrema urgência. | {{1}}: João, {{2}}: 1050, {{3}}: 10/02/2026, {{4}}: https://sua.loja/f |
+| `fatura_atrasada_3_autologin` | 🚨 Olá {{1}}, aviso crítico! A fatura #{{2}} venceu em {{3}}. Regularize em 1-clique sem precisar digitar senha através do link {{4}} imediatamente. | *(Mesmas amostras)* |
 
 ### 🛠️ Suporte e Serviços
 | Nome na Meta | Texto Sugerido (Corpo do Template) | Amostras (Samples) |
@@ -31,7 +37,9 @@ Para tirar o máximo proveito do módulo v1.1.0, recomendamos aprovar duas vers�
 | `servico_ativo` | Boas notícias {{1}}! O seu novo plano para {{2}} já está liberado. Você pode conferir as instruções e dados de acesso no link {{3}} de forma segura. | {{1}}: João, {{2}}: meusite.com, {{3}}: https://sua.loja/s |
 | `servico_ativo_autologin` | Boas notícias {{1}}! Seu serviço {{2}} está ativo. Faça login no painel de controle com apenas um clique pelo link {{3}} com total segurança. | *(Mesmas amostras)* |
 | `servico_suspenso` | Olá {{1}}, informamos que o seu serviço {{2}} foi temporariamente suspenso. Para entender o motivo e reativar sua conta, acesse o link {{3}} imediatamente. | {{1}}: João, {{2}}: meusite.com, {{3}}: https://sua.loja/s |
+| `servico_suspenso_autologin` | Olá {{1}}, informamos que o seu serviço {{2}} foi temporariamente suspenso. Reative sua conta com apenas um clique acessando o link {{3}} imediatamente. | *(Mesmas amostras)* |
 | `dominio_expirando` | Prezado(a) {{1}}, o domínio {{2}} expira em {{3}} dias, na data {{4}}. Para evitar que seu site fique fora do ar, renove pelo link {{5}} o quanto antes. | {{1}}: João, {{2}}: meusite.com, {{3}}: 5, {{4}}: 20/02/2026, {{5}}: https://sua.loja/d |
+| `dominio_expirando_autologin` | Prezado(a) {{1}}, o domínio {{2}} expira em {{3}} dias, na data {{4}}. Renove com apenas um clique sem precisar de senha pelo link {{5}} o quanto antes. | *(Mesmas amostras)* |
 
 ### 🔒 Administrativo (Sem Auto-Login)
 | Nome na Meta | Texto Sugerido (Corpo do Template) | Amostras (Samples) |

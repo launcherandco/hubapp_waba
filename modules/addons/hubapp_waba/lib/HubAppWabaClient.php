@@ -6,7 +6,7 @@ if (!defined("WHMCS")) die("Access Denied");
 
 /**
  * HubApp WABA Client - Conexão API Oficial Meta
- * Versão 1.1.0: Preparado para Auto-Login URL e tratamento de Erro 132018
+ * Versão 1.2.0: Preparado para Auto-Login URL e tratamento de Erro 132018
  */
 class HubAppWabaClient {
 
