@@ -151,7 +151,7 @@ add_hook('InvoiceUnpaid', 1, function($vars) {
     );
 });
 
-// 4 e 5 e 6. Lembretes de Fatura
+// 4 e 5 e 6. Lembretes de Fatura (Incluindo Pré-Vencimento)
 add_hook('InvoicePaymentReminder', 1, function($vars) {
     $inv = Capsule::table('tblinvoices')->where('id', $vars['invoiceid'])->first();
     $cli = Capsule::table('tblclients')->where('id', $inv->userid)->first();
@@ -160,9 +160,18 @@ add_hook('InvoicePaymentReminder', 1, function($vars) {
     $normalUrl = $systemUrl . "viewinvoice.php?id=" . $vars['invoiceid'];
     $path = "viewinvoice.php?id=" . $vars['invoiceid'];
     
-    $type = ($vars['type'] == 'first') ? 'First' : (($vars['type'] == 'second') ? 'Second' : 'Third');
+    // Identifica o evento correto com base no tipo de lembrete do WHMCS
+    if ($vars['type'] == 'reminder') {
+        $dispatchKey = 'InvoiceUnpaid'; // Direciona para o template "Fatura a Vencer"
+    } elseif ($vars['type'] == 'first') {
+        $dispatchKey = 'InvoicePaymentReminderFirst'; // 1º Aviso
+    } elseif ($vars['type'] == 'second') {
+        $dispatchKey = 'InvoicePaymentReminderSecond'; // 2º Aviso
+    } else {
+        $dispatchKey = 'InvoicePaymentReminderThird'; // Aviso Crítico (Third)
+    }
 
-    waba_dispatch('InvoicePaymentReminder' . $type, $cli->id, 
+    waba_dispatch($dispatchKey, $cli->id, 
         [$cli->firstname, $vars['invoiceid'], fromMySQLDate($inv->duedate), $normalUrl],
         $path,
         [$cli->firstname, $vars['invoiceid'], fromMySQLDate($inv->duedate), '{autologin_url}']
