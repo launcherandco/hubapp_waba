@@ -160,12 +160,15 @@ add_hook('InvoicePaymentReminder', 1, function($vars) {
     $normalUrl = $systemUrl . "viewinvoice.php?id=" . $vars['invoiceid'];
     $path = "viewinvoice.php?id=" . $vars['invoiceid'];
     
-    // Identifica o evento correto com base no tipo de lembrete do WHMCS
-    if ($vars['type'] == 'reminder') {
+    // Padroniza o texto que o WHMCS envia para letras minúsculas
+    $type = strtolower($vars['type']);
+
+    // Identifica o evento correto buscando a palavra-chave
+    if ($type == 'reminder') {
         $dispatchKey = 'InvoiceUnpaid'; // Direciona para o template "Fatura a Vencer"
-    } elseif ($vars['type'] == 'first') {
+    } elseif (strpos($type, 'first') !== false) {
         $dispatchKey = 'InvoicePaymentReminderFirst'; // 1º Aviso
-    } elseif ($vars['type'] == 'second') {
+    } elseif (strpos($type, 'second') !== false) {
         $dispatchKey = 'InvoicePaymentReminderSecond'; // 2º Aviso
     } else {
         $dispatchKey = 'InvoicePaymentReminderThird'; // Aviso Crítico (Third)
